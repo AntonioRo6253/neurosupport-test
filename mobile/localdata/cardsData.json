@@ -1,0 +1,22 @@
+{
+  "cardsData": [
+    {
+      "id": "1",
+      "title": "Guías Rápidas",
+      "description": "Accede a guías prácticas para el uso de pictogramas",
+      "imageUrl": "https://picsum.photos/300/200?random=1"
+    },
+    {
+      "id": "2",
+      "title": "Vídeos Tutoriales",
+      "description": "Aprende con nuestros tutoriales en video",
+      "imageUrl": "https://picsum.photos/300/200?random=2"
+    },
+    {
+      "id": "3",
+      "title": "Foro de Ayuda",
+      "description": "Comunidad de apoyo para compartir experiencias",
+      "imageUrl": "https://picsum.photos/300/200?random=3"
+    }
+  ]
+}

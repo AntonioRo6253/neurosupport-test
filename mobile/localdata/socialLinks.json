@@ -1,0 +1,20 @@
+{
+  "socialLinks": [
+    {
+      "name": "logo-youtube",
+      "url": "https://youtube.com/"
+    },
+    {
+      "name": "logo-tiktok",
+      "url": "https://tiktok.com/"
+    },
+    {
+      "name": "logo-instagram",
+      "url": "https://instagram.com/"
+    },
+    {
+      "name": "logo-facebook",
+      "url": "https://facebook.com/"
+    }
+  ]
+}
