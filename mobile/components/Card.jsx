@@ -13,21 +13,32 @@ import { Colors } from "../constants/Colors";
 
 const Card = ({ title, description, imageUrl }) => {
   const [showDescription, setShowDescription] = useState(false);
+  const [longPressActive, setLongPressActive] = useState(false);
   const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(30)).current; // Empieza 30px abajo
   const pressTimer = useRef(null);
   const router = useRouter();
   const colorScheme = useColorScheme() || "light";
   const theme = Colors[colorScheme];
 
   const handlePressIn = () => {
+    setLongPressActive(false);
     pressTimer.current = setTimeout(() => {
+      setLongPressActive(true);
       setShowDescription(true);
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
-    }, 500); // 500 ms para activar
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 500);
   };
 
   const handlePressOut = () => {
@@ -36,19 +47,28 @@ const Card = ({ title, description, imageUrl }) => {
       pressTimer.current = null;
     }
     if (showDescription) {
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }).start(() => setShowDescription(false));
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 30,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => setShowDescription(false));
     }
   };
 
   const handleCardPress = () => {
-    router.push({
-      pathname: "(tabs)/discovery/[postid]",
-      params: { title, description, imageUrl },
-    });
+    if (!longPressActive) {
+      router.push({
+        pathname: "(tabs)/discovery/[postid]",
+        params: { title, description, imageUrl },
+      });
+    }
   };
 
   return (
@@ -64,22 +84,37 @@ const Card = ({ title, description, imageUrl }) => {
         },
       ]}
     >
-      <Image
-        source={{ uri: imageUrl }}
-        style={styles.image}
-        resizeMode="cover"
-      />
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+        {/* Título siempre visible */}
+        <View style={styles.titleOverlay}>
+          <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+        </View>
+        {/* Descripción animada */}
         {showDescription && (
-          <Animated.Text
+          <Animated.View
             style={[
-              styles.description,
-              { color: theme.Gray?.Color54 || "#666", opacity },
+              styles.overlay,
+              {
+                opacity,
+                transform: [{ translateY }],
+                backgroundColor: theme.background + "ee",
+              },
             ]}
           >
-            {description}
-          </Animated.Text>
+            <Text
+              style={[
+                styles.description,
+                { color: theme.Gray?.Color54 || "#666" },
+              ]}
+            >
+              {description}
+            </Text>
+          </Animated.View>
         )}
       </View>
     </Pressable>
@@ -91,23 +126,43 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
     marginRight: 10,
-    marginBottom: 10,
     elevation: 3,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
+  imageContainer: {
+    width: "100%",
+    aspectRatio: 1.6, // Ajusta la altura de la tarjeta
+    position: "relative",
+  },
   image: {
     width: "100%",
-    height: 150,
+    height: "100%",
   },
-  content: {
+  titleOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    padding: 12,
+    backgroundColor: "rgba(0,0,0,0.3)", // Fondo semitransparente opcional
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  overlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
     padding: 15,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: 0,
   },
   description: {
     fontSize: 14,

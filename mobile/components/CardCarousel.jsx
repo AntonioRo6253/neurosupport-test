@@ -1,99 +1,79 @@
-import React, { useState } from "react";
-import { View, Dimensions, FlatList, Pressable, Text } from "react-native";
+import { View, Dimensions, Pressable, Text, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import Carousel from "react-native-reanimated-carousel";
 import Card from "./Card";
 
+const { width: screenWidth } = Dimensions.get("window");
+
+const VerMasCard = ({ onPress }) => (
+  <View style={{ width: screenWidth }}>
+    <Pressable
+      style={styles.verMasCard}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel="Ver más pictogramas"
+    >
+      <Text style={styles.verMasCardTitle}>Ver más</Text>
+      <Text style={styles.verMasCardDesc}>
+        Explora todos los pictogramas disponibles
+      </Text>
+    </Pressable>
+  </View>
+);
+
 const CardCarousel = ({ cards }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const screenWidth = Dimensions.get("window").width;
   const router = useRouter();
-
-  const renderItem = ({ item }) => (
-    <View style={{ width: screenWidth * 0.8 }}>
-      <Card
-        title={item.title}
-        description={item.description}
-        imageUrl={item.imageUrl}
-      />
-    </View>
-  );
-
-  // Card especial "Ver más"
-  const renderVerMasCard = () => (
-    <View style={{ width: screenWidth * 0.8 }}>
-      <Pressable
-        style={styles.verMasCard}
-        onPress={() => router.push("/Pictogramas")}
-      >
-        <Text style={styles.verMasCardTitle}>Ver más</Text>
-        <Text style={styles.verMasCardDesc}>
-          Explora todos los pictogramas disponibles
-        </Text>
-      </Pressable>
-    </View>
-  );
-
-  const handleScroll = (event) => {
-    const scrollPosition = event.nativeEvent.contentOffset.x;
-    const index = Math.round(scrollPosition / (screenWidth * 0.8));
-    setActiveIndex(index);
-  };
 
   // Agrega la card "Ver más" al final del array
   const dataWithVerMas = [...cards, { id: "ver-mas-card" }];
 
+  // Renderiza cada item
+  const renderItem = ({ item }) =>
+    item.id === "ver-mas-card" ? (
+      <VerMasCard onPress={() => router.push("/Pictogramas")} />
+    ) : (
+      <View style={{ width: screenWidth }}>
+        <Card
+          title={item.title}
+          description={item.description}
+          imageUrl={item.imageUrl}
+        />
+      </View>
+    );
+
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={dataWithVerMas}
-        renderItem={({ item, index }) =>
-          item.id === "ver-mas-card"
-            ? renderVerMasCard()
-            : renderItem({ item, index })
-        }
-        keyExtractor={(item, idx) => (item.id ? item.id : `card-${idx}`)}
-        horizontal
+    <View
+      id="carousel-component"
+      dataSet={{ kind: "basic-layouts", name: "left-align" }}
+    >
+      <Carousel
+        loop={false}
+        width={screenWidth}
+        height={258}
+        snapEnabled
         pagingEnabled
-        snapToInterval={screenWidth * 0.8 + 20}
-        decelerationRate="fast"
-        showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
-        contentContainerStyle={styles.listContent}
+        data={dataWithVerMas}
+        renderItem={renderItem}
+        mode="parallax"
+        modeConfig={{
+          parallaxScrollingScale: 0.9,
+          parallaxScrollingOffset: 50,
+        }}
       />
     </View>
   );
 };
 
-const styles = {
-  container: {
-    marginVertical: 20,
-  },
-  listContent: {},
-  pagination: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#ccc",
-    marginHorizontal: 5,
-  },
-  activeDot: {
-    backgroundColor: "#333",
-  },
+const styles = StyleSheet.create({
   verMasCard: {
     flex: 1,
     backgroundColor: "#1976d2",
-    borderRadius: 16,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    padding: 32,
-    marginHorizontal: 10,
-    minHeight: 180,
-    elevation: 2,
+    padding: 24,
+    minHeight: 220,
+    marginRight: 16,
   },
   verMasCardTitle: {
     color: "#fff",
@@ -106,6 +86,6 @@ const styles = {
     fontSize: 16,
     textAlign: "center",
   },
-};
+});
 
 export default CardCarousel;
