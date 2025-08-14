@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet } from "react-native";
+import LogoutButton from "@/components/LogoutButton";
 
 export default function AgendaScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Configuracion</Text>
-      {/* Contenido de la agenda aquí */}
+      <LogoutButton />
     </View>
   );
 }

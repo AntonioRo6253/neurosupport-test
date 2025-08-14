@@ -6,8 +6,10 @@ export default function DiscoveryScreen() {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ fontSize: 24 }}>Discovery</Text>
-      <Text style={{ marginTop: 16 }}>Categoría: {category}</Text>
+      <Text style={{ fontSize: 24, color: "white" }}>Discovery</Text>
+      <Text style={{ marginTop: 16, color: "white" }}>
+        Categoría: {category}
+      </Text>
     </View>
   );
 }

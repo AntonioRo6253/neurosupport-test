@@ -35,7 +35,7 @@ const HomeNav = () => {
           ]}
           onPress={() =>
             router.push({
-              pathname: "../discovery",
+              pathname: "discovery",
               params: { category: "pictogramas" },
             })
           }

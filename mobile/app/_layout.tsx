@@ -4,12 +4,14 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 // import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { AuthProvider, useAuth } from "../components/AuthContext";
+import { useEffect } from "react";
+import { useRouter, Stack } from "expo-router";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -23,12 +25,35 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <RootNavigator />
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </AuthProvider>
+  );
+}
+
+function RootNavigator() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/(auth)/Login");
+    }
+    if (!loading && user) {
+      router.replace("/(tabs)");
+    }
+  }, [user, loading]);
+
+  if (loading) return null;
+
+  return (
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="+not-found" />
+    </Stack>
   );
 }
